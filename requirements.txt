@@ -5,3 +5,5 @@ httptools
 pydantic
 uvicorn
 uvloop
+aiosqlite
+databases
