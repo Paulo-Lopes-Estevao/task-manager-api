@@ -1,0 +1,1 @@
+{"id":"6816a181-40a9-4488-9dee-5f6d1eb59eec","space":4845,"runtime":"python3.9","name":"task-manager-api","path":"tlzora","project":"a0ljm0ep","account":"144798365827","region":"eu-central-1","deps":["fastapi","gunicorn","h11","httptools","pydantic","uvicorn","uvloop","aiosqlite","databases"],"envs":null,"public":true,"log_level":"debug","cron":""}

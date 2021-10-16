@@ -22,18 +22,16 @@ database = databases.Database(DATABASE_URL)
 
 metadata = sqlalchemy.MetaData()
 
-persons = sqlalchemy.Table(
+person = sqlalchemy.Table(
     "person",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer,
                       primary_key=True, autoincrement=true),
     sqlalchemy.Column("name", sqlalchemy.String, nullable=true),
     sqlalchemy.Column("email", sqlalchemy.VARCHAR(125), nullable=true),
+    sqlalchemy.Column("password", sqlalchemy.VARCHAR(125), nullable=true),
     sqlalchemy.Column("photo", sqlalchemy.Text, nullable=true),
-    sqlalchemy.Column("updated", sqlalchemy.DATETIME,
-                      onupdate=current_timestamp),
-    sqlalchemy.Column("created", sqlalchemy.DATETIME,
-                      onupdate=current_timestamp),
+    sqlalchemy.Column("state", sqlalchemy.BOOLEAN, default="true"),
 )
 
 task = sqlalchemy.Table(
@@ -61,15 +59,9 @@ class PersonOut(BaseModel):
     id: int
     name: str
     email: str
+    password: str
     photo: str
-    updated: str
-    created: str
-
-
-class PersonInp(BaseModel):
-    name: str
-    email: str
-    photo: str
+    state: bool
 
 
 class TaskInp(BaseModel):
@@ -121,6 +113,29 @@ async def shutdown():
     await database.disconnect()
 
 
+
+@app.get("/")
+async def home():
+    """
+        Listagem das Tasks
+    """
+    return {
+        "API":"https://tlzora.deta.dev/docs",    
+        "Documentação": "https://tlzora.deta.dev/docs"
+    }
+
+@app.get("/account", response_model_exclude_defaults=PersonOut,
+name="Person",
+tags=["ACCOUNT"]
+)
+async def login_account(email: str,password: str):
+    """
+        entrar na Conta
+    """
+    query = person.select().where((person.c.email==email) & (person.c.password==password))
+    return await database.fetch_all(query)
+
+
 @app.get("/task", response_model_exclude_defaults=TaskOut,
 name="Task",
 tags=["TASK"]
@@ -137,11 +152,11 @@ async def read_task():
 name="Task",
 tags=["TASK"]
 )
-async def create_task(tasks: TaskInp):
+async def create_task(title,date: datetime.date,tasks: TaskOut):
     """
         Criação das Tasks
     """
-    query = task.insert().values(title=tasks.title,data=tasks.data,state=True,updated=datetime.datetime.now(),created=datetime.datetime.now())
+    query = task.insert().values(title=title,data=date,state=True,updated=datetime.datetime.now(),created=datetime.datetime.now())
     last_record_task = await database.execute(query)
     return {**tasks.dict()}
 
