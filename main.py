@@ -120,7 +120,7 @@ async def home():
         Listagem das Tasks
     """
     return {
-        "API":"https://tlzora.deta.dev/docs",    
+        "API":"https://tlzora.deta.dev",    
         "Documentação": "https://tlzora.deta.dev/docs"
     }
 
