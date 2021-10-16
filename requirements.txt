@@ -1,5 +1,4 @@
 fastapi
-gunicorn
 h11
 httptools
 pydantic
