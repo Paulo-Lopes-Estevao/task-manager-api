@@ -120,8 +120,8 @@ async def home():
         Listagem das Tasks
     """
     return {
-        "API":"https://tlzora.deta.dev",    
-        "Documentação": "https://tlzora.deta.dev/docs"
+        "API":"http://102.131.41.4",    
+        "Documentação": "http://102.131.41.4/docs"
     }
 
 @app.get("/account", response_model_exclude_defaults=PersonOut,
