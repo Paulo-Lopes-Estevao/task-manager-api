@@ -67,7 +67,21 @@ class PersonOut(BaseModel):
 class TaskInp(BaseModel):
     title: Optional[str] =None
     data: Optional[datetime.date] = None
-    state: Optional[bool]=None
+    #state: Optional[bool]=None
+
+    class Config:
+        orm_mode = True
+
+
+class TaskInpID(BaseModel):
+    id: Optional[int] =None
+
+    class Config:
+        orm_mode = True
+
+class TaskInpUp(BaseModel):
+    title: Optional[str] =None
+    data: Optional[datetime.date] = None
 
     class Config:
         orm_mode = True
@@ -152,35 +166,38 @@ async def read_task():
 name="Task",
 tags=["TASK"]
 )
-async def create_task(title,date: datetime.date,tasks: TaskOut):
+async def create_task(tasks: TaskInp):
     """
         Criação das Tasks
     """
-    query = task.insert().values(title=title,data=date,state=True,updated=datetime.datetime.now(),created=datetime.datetime.now())
+    query = task.insert().values(title=tasks.title,data=tasks.data,state=True,updated=datetime.datetime.now(),created=datetime.datetime.now())
     last_record_task = await database.execute(query)
-    return {**tasks.dict()}
+    return {"Cadastrado",last_record_task}
 
-@app.put("/task/{id_task}", response_model_exclude_defaults=TaskInp,
+@app.put("/task/{id}", response_model_exclude_defaults=TaskInpUp,
 name="Task",
 tags=["TASK"]
 )
-async def create_task(id_task: int,tasks: TaskInp):
+async def create_task(id: int, tasks: TaskInpUp):
     """
         Actualização das Tasks
     """
-    query = task.update().where(task.c.id==id_task).values(**tasks.dict())
+    query = task.update().where(task.c.id==id).values(**tasks.dict())
     last_record_task = await database.execute(query)
     return {**tasks.dict()}
 
 
-@app.delete("/task/{id_task}", response_model_exclude_defaults=TaskInp,
+@app.delete("/task/{id}", response_model_exclude_defaults=TaskInp,
 name="Task",
 tags=["TASK"]
 )
-async def create_task(id_task: int,tasks: TaskInp):
+async def create_task(id: int):
     """
         Apagar a Task
     """
-    query = task.delete().where(task.c.id==id_task)
+    query = task.delete().where(task.c.id==id)
     last_record_task = await database.execute(query)
-    return {**tasks.dict()}
+    return {
+        "message":"task apagada",
+        "status":200
+        }
